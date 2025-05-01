@@ -1,7 +1,7 @@
 from abc import ABCMeta, abstractmethod
 from typing import Type
 
-from sqlalchemy import select
+from sqlalchemy import select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from core.models.base import Base
@@ -59,6 +59,17 @@ class GenericRepository[_T_model](BaseRepository):
         await self._session.delete(instance)
         await self._session.commit()
         return instance
+
+    async def update(self, pk: int, data: dict) -> _T_model:
+        query = (
+            update(self._model)
+            .where(self._model.id == pk)
+            .values(**data)
+            .returning(self._model)
+        )
+        result = await self._session.execute(query)
+        await self._session.commit()
+        return result.scalar_one()
 
     async def filter(self, **filters) -> list[_T_model]:
         query = select(self._model)

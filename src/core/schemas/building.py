@@ -14,7 +14,13 @@ class BuildingCreate(BuildingBase):
     pass
 
 
-class BuildingRead(BuildingBase):
+class BuildingUpdate(BaseModel):
+    address: str | None = None
+    latitude: Annotated[float | None, Field(ge=-90.0, le=90.0)] = None
+    longitude: Annotated[float | None, Field(ge=-180.0, le=180.0)] = None
+
+
+class BuildingOut(BuildingBase):
     id: int
 
     created_at: datetime.datetime
