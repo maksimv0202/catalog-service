@@ -7,7 +7,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from core.models.base import Base
 
 
-_T_model = Base
+type _T_model = Base
 
 
 class BaseRepository(metaclass=ABCMeta):

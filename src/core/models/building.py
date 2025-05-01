@@ -1,5 +1,5 @@
 from sqlalchemy import String, Float
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from .base import Base
 
@@ -10,6 +10,8 @@ class Building(Base):
     address: Mapped[str] = mapped_column(String(255), nullable=False)
     latitude: Mapped[float] = mapped_column(Float, nullable=False)
     longitude: Mapped[float] = mapped_column(Float, nullable=False)
+
+    organizations = relationship('Organization', back_populates='building')
 
     def __repr__(self):
         return (f'<{self.__class__.__name__}(id={self.id}, address={self.address}, '
