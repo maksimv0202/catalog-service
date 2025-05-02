@@ -18,11 +18,11 @@ async def async_engine():
         poolclass=StaticPool
     )
     async with engine.begin() as conn:
-        await conn.execute('PRAGMA foreign_keys = ON')
-        await conn.run_sync(Base.metadata.create_all)
+        await conn.execute('PRAGMA foreign_keys = ON;')
+        await conn.run_sync(Base.metadata.create_all, bind=engine)
     yield engine
     async with engine.begin() as conn:
-        await conn.run_sync(Base.metadata.drop_all)
+        await conn.run_sync(Base.metadata.drop_all, bind=engine)
 
 
 @pytest_asyncio.fixture
