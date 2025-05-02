@@ -19,10 +19,10 @@ async def async_engine():
     )
     async with engine.begin() as conn:
         await conn.execute(text('PRAGMA foreign_keys = ON'))
-        await conn.run_sync(Base.metadata.create_all, bind=engine)
+        await conn.run_sync(Base.metadata.create_all)
     yield engine
     async with engine.begin() as conn:
-        await conn.run_sync(Base.metadata.drop_all, bind=engine)
+        await conn.run_sync(Base.metadata.drop_all)
 
 
 @pytest_asyncio.fixture
