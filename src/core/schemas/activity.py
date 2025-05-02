@@ -1,3 +1,4 @@
+import datetime
 from typing import Annotated
 
 from pydantic import BaseModel, Field
@@ -16,6 +17,9 @@ class ActivityCreate(ActivityBase):
 class ActivityOut(ActivityBase):
     id: int
     parent_id: int | None
+
+    created_at: datetime.datetime
+    updated_at: datetime.datetime
 
     model_config = {'from_attributes': True}
 

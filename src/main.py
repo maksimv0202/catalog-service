@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from api import building_router
+from api import activity_router, building_router, organization_router
 from utils.migrations import lifespan
 
 
@@ -23,4 +23,6 @@ app.add_middleware(
     allow_headers=['*']
 )
 
+app.include_router(activity_router, prefix='/activities', tags=['activity'])
 app.include_router(building_router, prefix='/buildings', tags=['building'])
+app.include_router(organization_router, prefix='/organizations', tags=['organization'])

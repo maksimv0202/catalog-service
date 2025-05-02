@@ -14,8 +14,8 @@ class Organization(Base):
     building_id: Mapped[int] = mapped_column(ForeignKey('building.id'), nullable=False)
     activity_id: Mapped[int] = mapped_column(ForeignKey('activity.id'), nullable=False)
 
-    building: Mapped['Building'] = relationship(back_populates='organizations')
-    activity: Mapped['Activity'] = relationship()
+    building: Mapped['Building'] = relationship(back_populates='organizations', lazy='selectin')
+    activity: Mapped['Activity'] = relationship(lazy='selectin')
 
     def __repr__(self):
         return (f'<{self.__class__.__name__}(id={self.id}, name={self.name}), '
