@@ -2,7 +2,7 @@ from typing import AsyncGenerator
 
 import pytest_asyncio
 from httpx import AsyncClient, ASGITransport
-from sqlalchemy import StaticPool
+from sqlalchemy import StaticPool, text
 from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker, AsyncSession
 
 from core.db import get_async_session
@@ -18,7 +18,7 @@ async def async_engine():
         poolclass=StaticPool
     )
     async with engine.begin() as conn:
-        await conn.execute('PRAGMA foreign_keys = ON;')
+        await conn.execute(text('PRAGMA foreign_keys = ON'))
         await conn.run_sync(Base.metadata.create_all, bind=engine)
     yield engine
     async with engine.begin() as conn:
