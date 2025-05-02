@@ -16,8 +16,7 @@ jobs:
       - name: Build
         uses: docker/bake-action@v6
         with:
-          context: .
-          push: false
+          source: .
   test:
     name: Run tests
     needs: build
