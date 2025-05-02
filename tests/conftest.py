@@ -18,6 +18,7 @@ async def async_engine():
         poolclass=StaticPool
     )
     async with engine.begin() as conn:
+        await conn.execute('PRAGMA foreign_keys = ON')
         await conn.run_sync(Base.metadata.create_all)
     yield engine
     async with engine.begin() as conn:
