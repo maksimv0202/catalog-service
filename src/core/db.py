@@ -15,6 +15,6 @@ engine = create_async_engine('postgresql+asyncpg://{}:{}@{}:{}/{}'.format(
 
 
 async def get_async_session() -> AsyncGenerator[AsyncSession, None]:
-    async_session = async_sessionmaker(engine, expire_on_commit=False)
+    async_session = async_sessionmaker(engine, class_=AsyncSession, expire_on_commit=False)
     async with async_session() as session:
         yield session

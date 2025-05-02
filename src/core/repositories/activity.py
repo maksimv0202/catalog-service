@@ -1,6 +1,7 @@
 from collections.abc import Sequence
 from sqlalchemy import select, delete
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import selectinload
 
 from core.models import Activity
 from core.repositories.base import GenericRepository
@@ -10,6 +11,11 @@ class ActivityRepository(GenericRepository[Activity]):
 
     def __init__(self, session: AsyncSession):
         super().__init__(Activity, session)
+
+    async def get_by_name(self, name: str) -> Activity:
+        return (await self._session.execute(
+            select(Activity).where(Activity.id == name)
+        )).scalar_one_or_none()
 
     async def get_nested_depth(self, parent_id: int) -> int:
         depth = 1

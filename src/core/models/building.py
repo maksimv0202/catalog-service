@@ -7,7 +7,7 @@ from .base import Base
 class Building(Base):
     id: Mapped[int] = mapped_column(primary_key=True)
 
-    address: Mapped[str] = mapped_column(String(255), nullable=False)
+    address: Mapped[str] = mapped_column(String(255), nullable=False, unique=True)
     latitude: Mapped[float] = mapped_column(Float, nullable=False)
     longitude: Mapped[float] = mapped_column(Float, nullable=False)
 
