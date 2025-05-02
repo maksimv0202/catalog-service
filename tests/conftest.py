@@ -29,6 +29,7 @@ async def async_engine():
 async def async_session(async_engine) -> AsyncGenerator[AsyncSession, None]:
     async_session = async_sessionmaker(async_engine, expire_on_commit=False)
     async with async_session() as session:
+        await session.execute(text('PRAGMA foreign_keys = ON'))
         yield session
 
 
