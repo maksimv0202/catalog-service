@@ -6,8 +6,8 @@ from core.repositories.base import GenericRepository
 
 class BuildingRepository(GenericRepository[Building]):
 
-    def __init__(self, _session: AsyncSession):
-        super().__init__(Building, _session)
+    def __init__(self, session: AsyncSession):
+        super().__init__(Building, session)
 
     # New methods for this Repository
     # ...

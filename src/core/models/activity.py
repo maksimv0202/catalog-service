@@ -13,7 +13,7 @@ class Activity(Base):
         nullable=True
     )
     children: Mapped['Activity | None'] = relationship(back_populates='parent')
-    parent: Mapped[list['Activity']] = relationship(back_populates='children', remote_side=[id])
+    parent: Mapped[list['Activity']] = relationship(back_populates='children', remote_side=[id], lazy='selectin')
 
     def __repr__(self):
         return f'<{self.__class__.__name__}(id={self.id}, name={self.name}, parent_id={self.parent_id})>'

@@ -1,7 +1,8 @@
 from abc import ABCMeta, abstractmethod
+from collections.abc import Sequence
 from typing import Type
 
-from sqlalchemy import select, update
+from sqlalchemy import exists, select, update, and_
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from core.models.base import Base
@@ -17,7 +18,7 @@ class BaseRepository(metaclass=ABCMeta):
         pass
 
     @abstractmethod
-    async def get_all(self, limit: int, offset: int) -> list[_T_model]:
+    async def get_all(self, limit: int, offset: int) -> Sequence[_T_model]:
         pass
 
     @abstractmethod
@@ -29,11 +30,13 @@ class BaseRepository(metaclass=ABCMeta):
         pass
 
     @abstractmethod
-    async def filter(self, **filters) -> list[_T_model]:
+    async def filter(self, **filters) -> Sequence[_T_model]:
         pass
 
 
 class GenericRepository[_T_model](BaseRepository):
+
+    __slots__ = ('_model', '_session')
 
     def __init__(self, model: Type[_T_model], session: AsyncSession):
         self._model = model
@@ -42,10 +45,12 @@ class GenericRepository[_T_model](BaseRepository):
     async def get(self, pk: int) -> _T_model | None:
         return await self._session.get(self._model, pk)
 
-    async def get_all(self, limit: int = 100, offset: int = 0) -> list[_T_model]:
-        query = select(self._model).limit(limit).offset(offset)
-        result = await self._session.execute(query)
-        return list(result.scalars().all())
+    async def get_all(self, limit: int = 100, offset: int = 0) -> Sequence[_T_model]:
+        return (await self._session.execute(
+            select(self._model)
+            .limit(limit)
+            .offset(offset)
+        )).scalars().all()
 
     async def create(self, data: dict) -> _T_model:
         instance = self._model(**data)
@@ -61,18 +66,29 @@ class GenericRepository[_T_model](BaseRepository):
         return instance
 
     async def update(self, pk: int, data: dict) -> _T_model:
-        query = (
+        result = await self._session.execute(
             update(self._model)
-            .where(self._model.id == pk)
+            .where(self._model.id == pk)  # type: ignore
             .values(**data)
             .returning(self._model)
         )
-        result = await self._session.execute(query)
         await self._session.commit()
         return result.scalar_one()
 
-    async def filter(self, **filters) -> list[_T_model]:
+    async def exists(self, pk: int | None = None, /, **unique_fields) -> bool:
+        if pk is not None:
+            condition = self._model.id == pk
+        elif unique_fields:
+            condition = and_(getattr(self._model, field) == value
+                             for field, value in unique_fields.items())
+        else:
+            raise ValueError()
+        return await self._session.scalar(
+            select(exists().where(condition))  # type: ignore
+        )
+
+    async def filter(self, **filters) -> Sequence[_T_model]:
         query = select(self._model)
         if filters:
             query = query.filter_by(**filters)
-        return list(await self._session.scalars(query))
+        return (await self._session.scalars(query)).all()
