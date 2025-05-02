@@ -2,8 +2,7 @@ from typing import AsyncGenerator
 
 import pytest_asyncio
 from httpx import AsyncClient, ASGITransport
-from sqlalchemy import StaticPool, text
-from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker, AsyncSession
+from sqlalchemy.ext.asyncio import async_sessionmaker, AsyncSession
 
 from core.db import get_async_session, engine
 from core.models import Base
