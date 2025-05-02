@@ -39,7 +39,7 @@
 
 ## 🐘 Схема базы данных:
 
-![Database Schema](https://github.com/user-attachments/assets/8c5275b4-2ca6-4d5a-84ec-d202de6dab25)
+![DB Schema](https://github.com/user-attachments/assets/309f07e7-d101-4315-be2f-f8623bbf8a16)
 
 ## 🐳 Запуск проекта в Docker:
 ...
