@@ -14,14 +14,16 @@ class ActivityCreate(ActivityBase):
     model_config = {'from_attributes': True}
 
 
-class ActivityOut(ActivityBase):
+class ActivityShortOut(ActivityBase):
     id: int
     parent_id: int | None
 
+    model_config = {'from_attributes': True}
+
+
+class ActivityOut(ActivityShortOut):
     created_at: datetime.datetime
     updated_at: datetime.datetime
-
-    model_config = {'from_attributes': True}
 
 
 class ActivityWithChildrenOut(ActivityOut):

@@ -104,11 +104,15 @@ async def create_activities_recursive(
 
 async def create_buildings(data: list[dict], repository: BuildingRepository):
     for _b in data:
+        if await repository.exists(address=_b['address']):
+            continue
         await repository.create(_b)
 
 
 async def create_organizations(data: list[dict], repository: OrganizationRepository):
     for _o in data:
+        if await repository.exists(address=_o['name']):
+            continue
         await repository.create(_o)
 
 

@@ -20,10 +20,13 @@ class BuildingUpdate(BaseModel):
     longitude: Annotated[float | None, Field(ge=-180.0, le=180.0)] = None
 
 
-class BuildingOut(BuildingBase):
+class BuildingShortOut(BuildingBase):
     id: int
 
+    model_config = {'from_attributes': True}
+
+
+class BuildingOut(BuildingShortOut):
     created_at: datetime.datetime
     updated_at: datetime.datetime
 
-    model_config = {'from_attributes': True}
