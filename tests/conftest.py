@@ -5,20 +5,14 @@ from httpx import AsyncClient, ASGITransport
 from sqlalchemy import StaticPool, text
 from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker, AsyncSession
 
-from core.db import get_async_session
+from core.db import get_async_session, engine
 from core.models import Base
 from main import app
 
 
 @pytest_asyncio.fixture(scope='function')
 async def async_engine():
-    engine = create_async_engine(
-        'sqlite+aiosqlite:///:memory:',
-        connect_args={'check_same_thread': False},
-        poolclass=StaticPool
-    )
     async with engine.begin() as conn:
-        await conn.execute(text('PRAGMA foreign_keys = ON'))
         await conn.run_sync(Base.metadata.create_all)
     yield engine
     async with engine.begin() as conn:
