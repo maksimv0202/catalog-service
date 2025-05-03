@@ -48,6 +48,7 @@ docker compose -f docker-compose.yml --env-file ./src/.env up -d
 
 ## 📦 Заполнение БД тестовыми данными:
 ```shell
+alembic upgrade head
 python commands.py generate_data
 # В docker
 docker exec -i api python commands.py generate_data  
