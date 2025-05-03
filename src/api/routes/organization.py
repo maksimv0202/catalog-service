@@ -51,7 +51,6 @@ async def search_organizations_by_search_point_and_radius(
     session: AsyncSession = Depends(get_async_session)
 ):
     lat, lon = map(lambda t: float(t.strip()), point.split(','))
-    print(lat, lon)
     service = OrganizationService(OrganizationRepository(session))
     return await service.search_by_radius(
         lat, lon, radius, page_params.limit, page_params.page - 1
