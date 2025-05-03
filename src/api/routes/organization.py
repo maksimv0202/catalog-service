@@ -3,6 +3,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from starlette import status
 
 from core.db import get_async_session
+from core.repositories.activity import ActivityRepository
+from core.repositories.building import BuildingRepository
 from core.repositories.organization import OrganizationRepository
 from core.schemas.organization import OrganizationOut, OrganizationCreate, OrganizationUpdate
 from core.schemas.pagination import PageParams
@@ -20,7 +22,7 @@ async def get_organizations(
 ):
     filters = {}
     if name:
-        filters['name__ilike'] = name
+        filters['name'] = name
     if building_id:
         filters['building_id'] = building_id
     if activity_id:
@@ -80,6 +82,16 @@ async def create_organization(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=f'Organization with name `{data.name}` already exists'
         )
+    if not await BuildingRepository(session).exists(data.building_id):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f'Building `{data.building_id}` not found'
+        )
+    if not await ActivityRepository(session).exists(data.activity_id):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f'Activity `{data.activity_id}` not found'
+        )
     instance = await repository.create(data.model_dump())
     await session.refresh(instance, ['building', 'activity'])
     return instance
@@ -96,6 +108,16 @@ async def update_organization(
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=f'Organization with name `{data.name}` already exists'
+        )
+    if not await BuildingRepository(session).exists(data.building_id):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f'Building `{data.building_id}` not found'
+        )
+    if not await ActivityRepository(session).exists(data.activity_id):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f'Activity `{data.activity_id}` not found'
         )
     try:
         return await repository.update(organization_id, data.model_dump(exclude_unset=True))

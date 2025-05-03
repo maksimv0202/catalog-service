@@ -10,8 +10,8 @@ from .building import BuildingShortOut
 class OrganizationBase(BaseModel):
     name: Annotated[str, Field(..., max_length=255)]
     phone_number: Annotated[str, Field(..., max_length=255)]
-    building_id: int
-    activity_id: int
+    building_id: Annotated[int, Field(..., ge=1)]
+    activity_id: Annotated[int, Field(..., ge=1)]
 
 
 class OrganizationCreate(OrganizationBase):
@@ -21,8 +21,8 @@ class OrganizationCreate(OrganizationBase):
 class OrganizationUpdate(BaseModel):
     name: Annotated[str | None, Field(..., max_length=255)] = None
     phone_number: Annotated[str | None, Field(..., max_length=255)] = None
-    building_id: int | None = None
-    activity_id: int | None = None
+    building_id: Annotated[int | None, Field(..., ge=1)] = None
+    activity_id: Annotated[int | None, Field(..., ge=1)] = None
 
 
 class OrganizationOut(BaseModel):
