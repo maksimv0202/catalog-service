@@ -2,6 +2,7 @@ from collections.abc import Sequence
 from sqlalchemy import select, delete
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from core.exceptions import ExceededMaxDepthError
 from core.models import Activity
 from core.repositories.base import GenericRepository
 
@@ -15,6 +16,22 @@ class ActivityRepository(GenericRepository[Activity]):
         return (await self._session.execute(
             select(Activity).where(Activity.id == name)
         )).scalar_one_or_none()
+
+    async def create(self, data: dict) -> Activity:
+        parent_id: int = data.get('parent_id')
+        if parent_id is not None:
+            depth = await self.get_nested_depth(parent_id)
+            if depth >= 3:
+                raise ExceededMaxDepthError('The maximum allowed nesting level has been exceeded')
+        instance = self._model(**data)
+        self._session.add(instance)
+        try:
+            await self._session.commit()
+            await self._session.refresh(instance)
+            return instance
+        except Exception:
+            await self._session.rollback()
+            raise
 
     async def get_nested_depth(self, parent_id: int) -> int:
         depth = 1

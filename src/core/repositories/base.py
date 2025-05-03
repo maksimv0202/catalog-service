@@ -46,11 +46,11 @@ class GenericRepository[_T_model](BaseRepository):
         return await self._session.get(self._model, pk)
 
     async def get_all(self, limit: int = 100, offset: int = 0) -> Sequence[_T_model]:
-        return (await self._session.execute(
+        return (await self._session.scalars(
             select(self._model)
             .limit(limit)
             .offset(offset)
-        )).scalars().all()
+        )).all()
 
     async def create(self, data: dict) -> _T_model:
         instance = self._model(**data)

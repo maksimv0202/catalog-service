@@ -3,6 +3,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from starlette import status
 
 from core.db import get_async_session
+from core.exceptions import ExceededMaxDepthError
 from core.repositories.activity import ActivityRepository
 from core.schemas.activity import ActivityOut, ActivityCreate, ActivityUpdate
 from core.schemas.pagination import PageParams
@@ -31,14 +32,13 @@ async def create_activity(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=f'Acivity with name `{data.name}` already exists'
         )
-    if data.parent_id is not None:
-        depth = await repository.get_nested_depth(data.parent_id)
-        if depth >= 3:
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail='The maximum allowed nesting level has been exceeded',
-            )
-    return await repository.create(data.model_dump())
+    try:
+        return await repository.create(data.model_dump())
+    except ExceededMaxDepthError:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail='The maximum allowed nesting level has been exceeded'
+        )
 
 
 @router.get('/{activity_id}', response_model=ActivityOut, status_code=status.HTTP_200_OK)

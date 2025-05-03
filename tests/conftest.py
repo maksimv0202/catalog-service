@@ -31,7 +31,8 @@ async def async_engine():
 
 @pytest_asyncio.fixture
 async def async_session(async_engine) -> AsyncGenerator[AsyncSession, None]:
-    async_session = async_sessionmaker(async_engine, class_=AsyncSession, autoflush=False, future=True, expire_on_commit=False)
+    async_session = async_sessionmaker(async_engine, class_=AsyncSession,
+                                       autoflush=False, future=True, expire_on_commit=False)
     async with async_session() as session:
         yield session
     await session.close()
