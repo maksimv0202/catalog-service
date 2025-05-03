@@ -2,8 +2,9 @@ from abc import ABCMeta, abstractmethod
 from collections.abc import Sequence
 from typing import Type
 
-from sqlalchemy import exists, select, update, and_
+from sqlalchemy import exists, select, update, and_, between
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import aliased
 
 from core.models.base import Base
 
@@ -93,8 +94,25 @@ class GenericRepository[_T_model](BaseRepository):
 
     async def filter(self, limit: int = 100, offset: int = 0, **filters) -> Sequence[_T_model]:
         query = select(self._model)
-        if filters:
-            query = query.filter_by(**filters)
+        conditions = []
+        joins = {}
+        for key, val in filters.items():
+            if '__' in key:
+                relation, field_op = key.split('__', 1)
+                if relation not in joins:
+                    related_model = getattr(self._model, relation).property.mapper.class_
+                    joins[relation] = aliased(related_model)
+                    query = query.join(joins[relation], getattr(self._model, relation))
+                model_field = getattr(joins[relation], field_op.replace('__in', ''))
+                if field_op.endswith('__in') and isinstance(val, tuple) and len(val) == 2:
+                    conditions.append(between(model_field, val[0], val[1]))
+                else:
+                    conditions.append(model_field == val)
+            else:
+                model_field = getattr(self._model, key)
+                conditions.append(model_field == val)
+        if conditions:
+            query = query.where(and_(*conditions))
         return (await self._session.scalars(
             query.limit(limit).offset(offset)
         )).all()

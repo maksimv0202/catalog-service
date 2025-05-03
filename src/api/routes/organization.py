@@ -8,6 +8,7 @@ from core.repositories.building import BuildingRepository
 from core.repositories.organization import OrganizationRepository
 from core.schemas.organization import OrganizationOut, OrganizationCreate, OrganizationUpdate
 from core.schemas.pagination import PageParams
+from core.services.organization import OrganizationService
 
 router = APIRouter()
 
@@ -46,18 +47,30 @@ async def search_organizations(
 async def search_organizations_by_search_point_and_radius(
     point: str = Query(..., description='Координаты точки в формате `lat, lon`'),
     radius: int = Query(..., description='Радиус поиска в метрах'),
+    page_params: PageParams = Depends(),
     session: AsyncSession = Depends(get_async_session)
 ):
-    pass
+    lat, lon = map(lambda t: float(t.strip()), point.split(','))
+    print(lat, lon)
+    service = OrganizationService(OrganizationRepository(session))
+    return await service.search_by_radius(
+        lat, lon, radius, page_params.limit, page_params.page - 1
+    )
 
 
 @router.get('/search/by-area', response_model=list[OrganizationOut], status_code=status.HTTP_200_OK)
 async def search_organizations_by_rectangular_area(
     point1: str = Query(..., description='Координаты первой точки прямоугольника в формате `lat, lon`'),
     point2: str = Query(..., description='Координаты второй точки прямоугольника в формате `lat, lon`'),
+    page_params: PageParams = Depends(),
     session: AsyncSession = Depends(get_async_session)
 ):
-    pass
+    lat1, lon1 = map(lambda t: float(t.strip()), point1.split(','))
+    lat2, lon2 = map(lambda t: float(t.strip()), point2.split(','))
+    service = OrganizationService(OrganizationRepository(session))
+    return await service.search_by_area(
+        lat1, lon1, lat2, lon2, page_params.limit, page_params.page - 1
+    )
 
 
 @router.get('/{organization_id}', response_model=OrganizationOut, status_code=status.HTTP_200_OK)
