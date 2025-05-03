@@ -68,3 +68,13 @@ docker exec -i api python commands.py generate_data
 ![Response search by radius](https://github.com/user-attachments/assets/7c3205f5-53f1-476a-a032-b28f15e7e649)
 
 ### 2. `search_organizations_by_rectangular_area`
+> АвтоГруз - шоссе Энтузиастов, 50, Москва, 111123 - `55.759203, 37.758743`
+
+![Search by area](https://github.com/user-attachments/assets/081c8005-1572-4b4b-b448-89a6d79a0e73)
+#### Request
+
+![Search by area request](https://github.com/user-attachments/assets/fd5cb578-4962-4c35-90b5-b7f76dda152d)
+
+#### Response
+
+![Search by area response](https://github.com/user-attachments/assets/6ef14c7f-80fe-45e8-8023-40e84019f12e)
