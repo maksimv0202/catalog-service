@@ -1,4 +1,20 @@
 services:
+  nginx:
+    image: nginx:stable
+    container_name: nginx
+    hostname: nginx
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/conf.d/default.conf
+    restart: unless-stopped
+    depends_on:
+      - api
+    networks:
+      - main
+    healthcheck:
+      test: ["CMD", "service", "nginx", "status"]
+      timeout: 10s
   api:
     container_name: api
     hostname: api

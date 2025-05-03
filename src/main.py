@@ -3,8 +3,11 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from api import activity_router, building_router, organization_router
 from api.dependencies import verify_credentials
+from core.logging import setup_logging
 from utils.migrations import lifespan
 
+
+setup_logging()
 
 app = FastAPI(
     title='Title',

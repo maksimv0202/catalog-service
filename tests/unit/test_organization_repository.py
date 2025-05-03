@@ -41,3 +41,7 @@ async def test_create_organization(async_session):
     assert result.phone_number == organization['phone_number']
     assert result.building_id == organization['building_id']
     assert result.activity_id == organization['activity_id']
+
+
+# Organization repository tests...
+# ...

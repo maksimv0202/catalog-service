@@ -42,6 +42,18 @@
 ![DB Schema](https://github.com/user-attachments/assets/309f07e7-d101-4315-be2f-f8623bbf8a16)
 
 ## 🐳 Запуск проекта в Docker:
+> Перед запуском изменить `POSTGRES_HOST` в .env
+```shell
+# Postgres Environment Variables
+POSTGRES_USERNAME="postgres"
+POSTGRES_PASSWORD="postgres"
+POSTGRES_DB="catalog"
+POSTGRES_HOST=postgres
+POSTGRES_PORT="5432"
+# FastAPI Environment Variables
+SECRET_KEY="TEST-KEY"
+```
+
 ```shell
 docker compose -f docker-compose.yml --env-file ./src/.env up -d
 ```
