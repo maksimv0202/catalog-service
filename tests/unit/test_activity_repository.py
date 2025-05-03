@@ -37,5 +37,38 @@ async def test_create_max_depth_activities(async_session):
         await repository.create(activity)
     await repository.create({'name': '1', 'parent_id': 2})
     await repository.create({'name': '2', 'parent_id': 3})
-    with pytest.raises(ExceededMaxDepthError) as e:
+    with pytest.raises(ExceededMaxDepthError):
         await repository.create({'name': '3', 'parent_id': 4})
+
+
+@pytest.mark.asyncio
+async def test_update_activity_with_no_conflict(async_session):
+    repository = ActivityRepository(async_session)
+    data = ACTIVITIES
+    for activity in data:
+        await repository.create(activity)
+    await repository.create({'name': '1', 'parent_id': 2})
+    await repository.update(4, {'parent_id': 1})
+
+    assert (await repository.get(4)).parent_id == 1
+
+
+@pytest.mark.asyncio
+async def test_update_activity_with_depth_conflict(async_session):
+    repository = ActivityRepository(async_session)
+    data = ACTIVITIES
+    for activity in data:
+        await repository.create(activity)
+    await repository.create({'name': '1', 'parent_id': 2})
+
+    await repository.create({'name': '3'})
+    await repository.create({'name': '4', 'parent_id': 5})
+
+    with pytest.raises(ExceededMaxDepthError):
+        await repository.update(5, {'name': '6', 'parent_id': 2})
+
+    with pytest.raises(ExceededMaxDepthError):
+        await repository.update(5, {'name': '6', 'parent_id': 3})
+
+    with pytest.raises(ExceededMaxDepthError):
+        await repository.update(5, {'name': '6', 'parent_id': 4})

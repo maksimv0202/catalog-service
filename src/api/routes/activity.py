@@ -60,14 +60,13 @@ async def update_activity(
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND
         )
-    if data.parent_id is not None:
-        depth = await repository.get_nested_depth(data.parent_id)
-        if depth >= 3:
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail='The maximum allowed nesting level has been exceeded',
-            )
-    return await repository.update(activity_id, data.model_dump())
+    try:
+        return await repository.update(activity_id, data.model_dump())
+    except ExceededMaxDepthError:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail='The maximum allowed nesting level has been exceeded',
+        )
 
 
 @router.delete('/{activity_id}', response_model=ActivityOut, status_code=status.HTTP_200_OK)
