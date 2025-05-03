@@ -23,11 +23,11 @@ class OrganizationRepository(GenericRepository[Organization]):
             select(Activity.id)
             .where(Activity.parent_id == subtree.c.id)
         )
-        return (await self._session.execute(
+        return (await self._session.scalars(
             select(Organization)
             .where(Organization.activity_id.in_(select(subtree.c.id)))
             .options(
                 selectinload(Organization.building),
                 selectinload(Organization.activity)
             )
-        )).scalars().all()
+        )).all()

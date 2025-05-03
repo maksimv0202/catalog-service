@@ -111,7 +111,7 @@ async def create_buildings(data: list[dict], repository: BuildingRepository):
 
 async def create_organizations(data: list[dict], repository: OrganizationRepository):
     for _o in data:
-        if await repository.exists(address=_o['name']):
+        if await repository.exists(name=_o['name']):
             continue
         await repository.create(_o)
 

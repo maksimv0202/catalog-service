@@ -5,18 +5,26 @@ from starlette import status
 from core.db import get_async_session
 from core.repositories.building import BuildingRepository
 from core.schemas.building import BuildingCreate, BuildingOut, BuildingUpdate
-
+from core.schemas.pagination import PageParams
 
 router = APIRouter()
 
 
 @router.get('', response_model=list[BuildingOut], status_code=status.HTTP_200_OK)
-async def get_buildings(session: AsyncSession = Depends(get_async_session)):
-    return await BuildingRepository(session).get_all()
+async def get_buildings(
+    page_params: PageParams = Depends(),
+    session: AsyncSession = Depends(get_async_session)
+):
+    return await BuildingRepository(session).get_all(
+        limit=page_params.limit, offset=page_params.page - 1
+    )
 
 
 @router.get('/{building_id}', response_model=BuildingOut, status_code=status.HTTP_200_OK)
-async def get_building_by_id(building_id: int, session: AsyncSession = Depends(get_async_session)):
+async def get_building_by_id(
+    building_id: int,
+    session: AsyncSession = Depends(get_async_session)
+):
     building = await BuildingRepository(session).get(building_id)
     if building is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
@@ -24,7 +32,10 @@ async def get_building_by_id(building_id: int, session: AsyncSession = Depends(g
 
 
 @router.post('', response_model=BuildingOut, status_code=status.HTTP_201_CREATED)
-async def create_building(data: BuildingCreate, session: AsyncSession = Depends(get_async_session)):
+async def create_building(
+    data: BuildingCreate,
+    session: AsyncSession = Depends(get_async_session)
+):
     try:
         return await BuildingRepository(session).create(data.model_dump())
     except Exception as e:
@@ -32,7 +43,10 @@ async def create_building(data: BuildingCreate, session: AsyncSession = Depends(
 
 
 @router.delete('/{building_id}', response_model=BuildingOut, status_code=status.HTTP_200_OK)
-async def delete_building(building_id: int, session: AsyncSession = Depends(get_async_session)):
+async def delete_building(
+    building_id: int,
+    session: AsyncSession = Depends(get_async_session)
+):
     repository = BuildingRepository(session)
     building = await repository.get(building_id)
     if building is None:
@@ -45,9 +59,11 @@ async def delete_building(building_id: int, session: AsyncSession = Depends(get_
 
 
 @router.patch('/{building_id}', response_model=BuildingUpdate, status_code=status.HTTP_200_OK)
-async def update_building(building_id: int,
-                          data: BuildingUpdate,
-                          session: AsyncSession = Depends(get_async_session)):
+async def update_building(
+    building_id: int,
+    data: BuildingUpdate,
+    session: AsyncSession = Depends(get_async_session)
+):
     repository = BuildingRepository(session)
     building = await repository.get(building_id)
     if building is None:

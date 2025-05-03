@@ -30,7 +30,7 @@ class BaseRepository(metaclass=ABCMeta):
         pass
 
     @abstractmethod
-    async def filter(self, **filters) -> Sequence[_T_model]:
+    async def filter(self, limit: int, offset: int, **filters) -> Sequence[_T_model]:
         pass
 
 
@@ -55,9 +55,13 @@ class GenericRepository[_T_model](BaseRepository):
     async def create(self, data: dict) -> _T_model:
         instance = self._model(**data)
         self._session.add(instance)
-        await self._session.commit()
-        await self._session.refresh(instance)
-        return instance
+        try:
+            await self._session.commit()
+            await self._session.refresh(instance)
+            return instance
+        except Exception:
+            await self._session.rollback()
+            raise
 
     async def delete(self, pk: int) -> _T_model:
         instance = await self.get(pk)
@@ -75,7 +79,7 @@ class GenericRepository[_T_model](BaseRepository):
         await self._session.commit()
         return result.scalar_one()
 
-    async def exists(self, pk: int | None = None, /, **unique_fields) -> bool:
+    async def exists(self, pk: int | None = None, **unique_fields) -> bool:
         if pk is not None:
             condition = self._model.id == pk
         elif unique_fields:
@@ -87,8 +91,10 @@ class GenericRepository[_T_model](BaseRepository):
             select(exists().where(condition))  # type: ignore
         )
 
-    async def filter(self, **filters) -> Sequence[_T_model]:
+    async def filter(self, limit: int = 100, offset: int = 0, **filters) -> Sequence[_T_model]:
         query = select(self._model)
         if filters:
             query = query.filter_by(**filters)
-        return (await self._session.scalars(query)).all()
+        return (await self._session.scalars(
+            query.limit(limit).offset(offset)
+        )).all()

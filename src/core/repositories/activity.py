@@ -1,7 +1,6 @@
 from collections.abc import Sequence
 from sqlalchemy import select, delete
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.orm import selectinload
 
 from core.models import Activity
 from core.repositories.base import GenericRepository
@@ -32,10 +31,10 @@ class ActivityRepository(GenericRepository[Activity]):
         return depth
 
     async def get_roots(self) -> Sequence[Activity]:
-        return (await self._session.execute(
+        return (await self._session.scalars(
             select(Activity)
             .where(Activity.parent_id.is_(None)))
-        ).scalars().all()
+        ).all()
 
     async def delete_with_children(self, activity_id: int) -> None:
         subtree = (

@@ -5,6 +5,7 @@ from starlette import status
 from core.db import get_async_session
 from core.repositories.organization import OrganizationRepository
 from core.schemas.organization import OrganizationOut, OrganizationCreate, OrganizationUpdate
+from core.schemas.pagination import PageParams
 
 router = APIRouter()
 
@@ -14,6 +15,7 @@ async def get_organizations(
     name: str | None = Query(default=None, description='Filter by Organization name'),
     building_id: int | None = Query(default=None, description='Filter by Building ID'),
     activity_id: int | None = Query(default=None, description='Filter by Activity ID'),
+    page_params: PageParams = Depends(),
     session: AsyncSession = Depends(get_async_session)
 ):
     filters = {}
@@ -23,7 +25,11 @@ async def get_organizations(
         filters['building_id'] = building_id
     if activity_id:
         filters['activity_id'] = activity_id
-    return await OrganizationRepository(session).filter(**filters)
+    return await OrganizationRepository(session).filter(
+        limit=page_params.limit,
+        offset=page_params.page - 1,
+        **filters
+    )
 
 
 @router.get('/search', response_model=list[OrganizationOut], status_code=status.HTTP_200_OK)

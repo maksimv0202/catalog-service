@@ -1,7 +1,8 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Depends
 from fastapi.middleware.cors import CORSMiddleware
 
 from api import activity_router, building_router, organization_router
+from api.dependencies import verify_credentials
 from utils.migrations import lifespan
 
 
@@ -10,7 +11,8 @@ app = FastAPI(
     description='Description',
     version='1.0',
     root_path='/api/v1',
-    lifespan=lifespan
+    lifespan=lifespan,
+    dependencies=[Depends(verify_credentials)]
 )
 
 origins = ['http://localhost', 'http://localhost:8080']
