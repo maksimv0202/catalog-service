@@ -53,3 +53,18 @@ python commands.py generate_data
 # В docker
 docker exec -i api python commands.py generate_data  
 ```
+
+## 📍 Поиск организаций в заданном радиусе/прямоугольной области.
+
+### 1. `search_organizations_by_search_point_and_radius`
+> Мясной Дом - 4-й Добрынинский переулок, 1/9с1, Москва, 119049 - `55.724261, 37.617249`
+
+![search_organizations_by_search_point_and_radius image](https://github.com/user-attachments/assets/5d80a1cb-21e9-46c5-a650-b42bcb783b3c)
+
+#### Request
+![Request search by radius](https://github.com/user-attachments/assets/2a546ff0-b522-4fac-a1da-628f1902d277)
+
+#### Response
+![Response search by radius](https://github.com/user-attachments/assets/7c3205f5-53f1-476a-a032-b28f15e7e649)
+
+### 2. `search_organizations_by_rectangular_area`

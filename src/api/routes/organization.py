@@ -45,8 +45,8 @@ async def search_organizations(
 
 @router.get('/search/by-radius', response_model=list[OrganizationOut], status_code=status.HTTP_200_OK)
 async def search_organizations_by_search_point_and_radius(
-    point: str = Query(..., description='Координаты точки в формате `lat, lon`'),
-    radius: int = Query(..., description='Радиус поиска в метрах'),
+    point: str = Query(..., description='Coordinates of the point in the format `lat, lon`'),
+    radius: int = Query(..., description='Search radius in meters'),
     page_params: PageParams = Depends(),
     session: AsyncSession = Depends(get_async_session)
 ):
@@ -60,8 +60,8 @@ async def search_organizations_by_search_point_and_radius(
 
 @router.get('/search/by-area', response_model=list[OrganizationOut], status_code=status.HTTP_200_OK)
 async def search_organizations_by_rectangular_area(
-    point1: str = Query(..., description='Координаты первой точки прямоугольника в формате `lat, lon`'),
-    point2: str = Query(..., description='Координаты второй точки прямоугольника в формате `lat, lon`'),
+    point1: str = Query(..., description='Coordinates of the first point of the rectangle in the format `lat, lon`'),
+    point2: str = Query(..., description='Coordinates of the second point of the rectangle in the format `lat, lon`'),
     page_params: PageParams = Depends(),
     session: AsyncSession = Depends(get_async_session)
 ):

@@ -77,13 +77,13 @@ ORGANIZATIONS = [
     {
         'name': 'АвтоГруз',
         'phone_number': '+74952223344',
-        'building_id': 1,
+        'building_id': 5,
         'activity_id': 4,
     },
     {
         'name': 'Все для авто',
         'phone_number': '+74951112233',
-        'building_id': 1,
+        'building_id': 4,
         'activity_id': 6,
     },
 ]
